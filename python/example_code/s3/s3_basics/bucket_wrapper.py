@@ -123,7 +123,7 @@ class BucketWrapper:
             acl = self.bucket.Acl()
             # Putting an ACL overwrites the existing ACL. If you want to preserve
             # existing grants, append new grants to the list of existing grants.
-            grants = acl.grants if acl.grants else []
+            grants = acl.grants or []
             grants.append({
                 'Grantee': {
                     'Type': 'Group',
@@ -403,15 +403,14 @@ def usage_demo():
         print(f"Bucket {bucket.name} has policy {json.dumps(policy)}.")
         bucket.delete_policy()
     except ClientError as error:
-        if error.response['Error']['Code'] == 'MalformedPolicy':
-            print('*'*88)
-            print("This demo couldn't set the bucket policy because the principal user\n"
-                  "specified in the demo policy does not exist. For this request to\n"
-                  "succeed, you must replace the user ARN with an existing AWS user.")
-            print('*' * 88)
-        else:
+        if error.response['Error']['Code'] != 'MalformedPolicy':
             raise
 
+        print('*'*88)
+        print("This demo couldn't set the bucket policy because the principal user\n"
+              "specified in the demo policy does not exist. For this request to\n"
+              "succeed, you must replace the user ARN with an existing AWS user.")
+        print('*' * 88)
     put_rules = [{
         'ID': str(uuid.uuid1()),
         'Filter': {

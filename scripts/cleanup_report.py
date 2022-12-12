@@ -81,7 +81,7 @@ def make_github_url(folder_name, file_name):
     :return: The full URL to the file on GitHub.
     """
     folder_url = request.pathname2url(folder_name)
-    base_url = urljoin(GITHUB_URL, folder_url) + '/'
+    base_url = f'{urljoin(GITHUB_URL, folder_url)}/'
     file_url = request.pathname2url(file_name)
     file_url = urljoin(base_url, file_url)
     return file_url
@@ -172,9 +172,10 @@ def write_report(examples, repo_files, report_path=None, summarize=False, dirty=
                         clean_files.append(file_url)
                         ext = os.path.splitext(file_url)[1].lstrip('.')
                         language = EXT_LOOKUP[ext]
-                        for service in file.get('services', ['']):
-                            lines.append(
-                                ','.join([file_url, language, service]))
+                        lines.extend(
+                            ','.join([file_url, language, service])
+                            for service in file.get('services', [''])
+                        )
                     else:
                         print(f"File '{file_url}' reported a second time in "
                               f"{example['metadata_path']}.")

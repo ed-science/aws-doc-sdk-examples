@@ -95,10 +95,11 @@ class ObjectWrapper:
         :return: The list of objects.
         """
         try:
-            if not prefix:
-                objects = list(bucket.objects.all())
-            else:
-                objects = list(bucket.objects.filter(Prefix=prefix))
+            objects = (
+                list(bucket.objects.filter(Prefix=prefix))
+                if prefix
+                else list(bucket.objects.all())
+            )
             logger.info("Got objects %s from bucket '%s'",
                         [o.key for o in objects], bucket.name)
         except ClientError:
@@ -216,7 +217,7 @@ class ObjectWrapper:
             acl = self.object.Acl()
             # Putting an ACL overwrites the existing ACL, so append new grants
             # if you want to preserve existing grants.
-            grants = acl.grants if acl.grants else []
+            grants = acl.grants or []
             grants.append({
                 'Grantee': {
                     'Type': 'AmazonCustomerByEmail',
@@ -289,7 +290,7 @@ def usage_demo():
         line_wrapper = ObjectWrapper(bucket.Object(f'line-{line}'))
         line_wrapper.put(bytes(lines[line], 'utf-8'))
         line_wrappers.append(line_wrapper)
-    print(f"Put 10 random lines from this script as objects.")
+    print("Put 10 random lines from this script as objects.")
 
     listed_lines = ObjectWrapper.list(bucket, 'line-')
     print(f"Their keys are: {', '.join(l.key for l in listed_lines)}")
@@ -300,7 +301,7 @@ def usage_demo():
     line.delete()
     print(f"Deleted object with key {line.key}.")
 
-    copied_obj = bucket.Object(line_wrappers[0].key + '-copy')
+    copied_obj = bucket.Object(f'{line_wrappers[0].key}-copy')
     line_wrappers[0].copy(copied_obj)
     print(f"Made a copy of object {line_wrappers[0].key}, named {copied_obj.key}.")
 
@@ -309,16 +310,18 @@ def usage_demo():
         acl = obj_wrapper.get_acl()
         print(f"Put ACL grants on object {obj_wrapper.key}: {json.dumps(acl.grants)}")
     except ClientError as error:
-        if error.response['Error']['Code'] == 'UnresolvableGrantByEmailAddress':
-            print('*'*88)
-            print("This demo couldn't apply the ACL to the object because the email\n"
-                  "address specified as the grantee is for a test user who does not\n"
-                  "exist. For this request to succeed, you must replace the grantee\n"
-                  "email with one for an existing AWS user.")
-            print('*' * 88)
-        else:
+        if (
+            error.response['Error']['Code']
+            != 'UnresolvableGrantByEmailAddress'
+        ):
             raise
 
+        print('*'*88)
+        print("This demo couldn't apply the ACL to the object because the email\n"
+              "address specified as the grantee is for a test user who does not\n"
+              "exist. For this request to succeed, you must replace the grantee\n"
+              "email with one for an existing AWS user.")
+        print('*' * 88)
     ObjectWrapper.empty_bucket(bucket)
     print(f"Emptied bucket {bucket.name} in preparation for deleting it.")
 

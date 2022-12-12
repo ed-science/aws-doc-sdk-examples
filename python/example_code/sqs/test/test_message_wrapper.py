@@ -78,10 +78,10 @@ def test_send_messages_wrong_size(make_stubber, make_queue, count):
     sqs_stubber = make_stubber(message_wrapper.sqs.meta.client)
     queue = make_queue(sqs_stubber, message_wrapper.sqs)
 
-    messages = [{
-        'body': f'Another body {ind}',
-        'attributes': {}
-    } for ind in range(0, count)]
+    messages = [
+        {'body': f'Another body {ind}', 'attributes': {}}
+        for ind in range(count)
+    ]
 
     sqs_stubber.stub_send_message_batch(
         queue.url,
@@ -109,10 +109,10 @@ def test_receive_messages(make_stubber, make_queue, send_count, receive_count,
     sqs_stubber = make_stubber(message_wrapper.sqs.meta.client)
     queue = make_queue(sqs_stubber, message_wrapper.sqs)
 
-    sent_messages = [{
-        'body': f"I have several bodies. This is #{ind}.",
-        'attributes': {}
-    } for ind in range(0, send_count)]
+    sent_messages = [
+        {'body': f"I have several bodies. This is #{ind}.", 'attributes': {}}
+        for ind in range(send_count)
+    ]
     if send_count > 0:
         sqs_stubber.stub_send_message_batch(queue.url, sent_messages)
         message_wrapper.send_messages(queue, sent_messages)
@@ -189,8 +189,7 @@ def test_delete_messages_not_exist(make_stubber, make_queue):
     sqs_stubber = make_stubber(message_wrapper.sqs.meta.client)
     queue = make_queue(sqs_stubber, message_wrapper.sqs)
     messages = [
-        queue.Message(receipt_handle=f'fake-handle-{ind}')
-        for ind in range(0, 5)
+        queue.Message(receipt_handle=f'fake-handle-{ind}') for ind in range(5)
     ]
 
     sqs_stubber.stub_delete_message_batch(queue.url, messages, 0, len(messages))
@@ -198,5 +197,7 @@ def test_delete_messages_not_exist(make_stubber, make_queue):
     response = message_wrapper.delete_messages(queue, messages)
 
     assert len(response['Failed']) == len(messages)
-    assert all([failed['Code'] == 'ReceiptHandleIsInvalid'
-                for failed in response['Failed']])
+    assert all(
+        failed['Code'] == 'ReceiptHandleIsInvalid'
+        for failed in response['Failed']
+    )

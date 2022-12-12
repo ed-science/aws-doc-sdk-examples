@@ -76,7 +76,7 @@ def make_github_url(folder_name, file_name):
     :return: The full URL to the file on GitHub.
     """
     folder_url = request.pathname2url(folder_name)
-    base_url = urljoin(GITHUB_URL, folder_url) + '/'
+    base_url = f'{urljoin(GITHUB_URL, folder_url)}/'
     file_url = request.pathname2url(file_name)
     file_url = urljoin(base_url, file_url)
     return file_url
