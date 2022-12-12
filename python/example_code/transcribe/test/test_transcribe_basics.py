@@ -60,7 +60,7 @@ def test_list_jobs(make_stubber, job_slice, error_code):
     transcribe_client = boto3.client('transcribe')
     transcribe_stubber = make_stubber(transcribe_client)
     job_filter = 'test-filter'
-    jobs = [make_test_job(index) for index in range(0, 10)]
+    jobs = [make_test_job(index) for index in range(10)]
 
     transcribe_stubber.stub_list_transcription_jobs(
         job_filter, jobs, job_slice, error_code=error_code)
@@ -144,7 +144,7 @@ def test_list_vocabularies(make_stubber, vocab_slice, error_code):
     transcribe_client = boto3.client('transcribe')
     transcribe_stubber = make_stubber(transcribe_client)
     vocab_filter = 'test-filter'
-    vocabs = [make_test_vocabulary(index) for index in range(0, 10)]
+    vocabs = [make_test_vocabulary(index) for index in range(10)]
 
     transcribe_stubber.stub_list_vocabularies(
         vocab_filter, vocabs, vocab_slice, error_code=error_code)

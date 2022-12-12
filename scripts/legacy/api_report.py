@@ -125,7 +125,7 @@ def write_report(examples, report_path=None):
             for file in example['files']:
                 metadata_folder = os.path.split(example['metadata_path'])[0]
                 metadata_url = request.pathname2url(metadata_folder)
-                base_url = urljoin(GITHUB_URL, metadata_url) + '/'
+                base_url = f'{urljoin(GITHUB_URL, metadata_url)}/'
                 file_url = request.pathname2url(file['path'])
                 file_url = urljoin(base_url, file_url)
                 ext = os.path.splitext(file_url)[1].lstrip('.')

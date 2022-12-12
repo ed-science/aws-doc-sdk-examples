@@ -60,7 +60,8 @@ def test_list(make_stubber, error_code):
     bucket_name = 'test-bucket_name'
     wrapper = BucketWrapper(s3_resource.Bucket(bucket_name))
     created_buckets = [
-        s3_resource.Bucket(f'{bucket_name}-{ind}') for ind in range(0, 5)]
+        s3_resource.Bucket(f'{bucket_name}-{ind}') for ind in range(5)
+    ]
 
     s3_stubber.stub_list_buckets(created_buckets, error_code=error_code)
 

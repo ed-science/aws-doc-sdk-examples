@@ -90,12 +90,15 @@ class SqsStubber(ExampleStubber):
             } for ind, msg in enumerate(messages)]
         }
         response = {
-            'Successful': [{
-                'Id': str(ind),
-                'MessageId': f'msg-{ind}',
-                'MD5OfMessageBody': 'Test-MD5-Body',
-            } for ind in range(0, len(messages))],
-            'Failed': []
+            'Successful': [
+                {
+                    'Id': str(ind),
+                    'MessageId': f'msg-{ind}',
+                    'MD5OfMessageBody': 'Test-MD5-Body',
+                }
+                for ind in range(len(messages))
+            ],
+            'Failed': [],
         }
         self._stub_bifurcator(
             'send_message_batch', expected_params, response, error_code=error_code)
@@ -143,14 +146,15 @@ class SqsStubber(ExampleStubber):
             } for ind, msg in enumerate(messages)]
         }
         response = {
-            'Successful': [{
-                'Id': str(ind)
-            } for ind in range(0, successes)],
-            'Failed': [{
-                'Id': str(ind),
-                'Code': 'ReceiptHandleIsInvalid',
-                'SenderFault': False
-            } for ind in range(0, failures)]
+            'Successful': [{'Id': str(ind)} for ind in range(successes)],
+            'Failed': [
+                {
+                    'Id': str(ind),
+                    'Code': 'ReceiptHandleIsInvalid',
+                    'SenderFault': False,
+                }
+                for ind in range(failures)
+            ],
         }
         self._stub_bifurcator(
             'delete_message_batch', expected_params, response, error_code=error_code)

@@ -80,7 +80,7 @@ def main():
                 """
     char_set = "UTF-8"
 
-    print(f"Sending email.")
+    print("Sending email.")
     message_id = send_email_message(
         boto3.client('pinpoint-email'), sender, to_addresses, cc_addresses, char_set,
         subject, html_message, text_message)
